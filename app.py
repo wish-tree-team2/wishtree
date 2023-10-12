@@ -4,6 +4,7 @@
 1. render_template : html파일을 가져와서 보여준다
 '''
 from flask import Flask, render_template, request, redirect, url_for
+from datetime import datetime
 app = Flask(__name__)
 # DB 기본 코드
 import os
@@ -11,68 +12,40 @@ from flask_sqlalchemy import SQLAlchemy
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-        'sqlite:///' + os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
 
-class Song(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
-    artist = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    image_url = db.Column(db.String(10000), nullable=False)
+class Wish(db.Model):
+
+    wish_id = db.Column(db.Integer, primary_key=True)
+    contents = db.Column(db.String(1000), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f'{self.title} {self.artist} 추천 by {self.username}'
+        return f'Wish: {self.contents}'
 
 with app.app_context():
     db.create_all()
 
-@app.route("/")
-def home():
-    name = '최지웅'
-    motto = "행복해서 웃는게 아니라 웃어서 행복합니다."
+#소원 게시글 생성
+@app.route("/wish/create/")
+def wish_create():
 
-    context = {
-        "name": name,
-        "motto": motto,
-    }
-    return render_template('motto.html', data=context)
-
-@app.route("/music/")
-def music():
-    song_list = Song.query.all()
-    return render_template('music.html', data=song_list)
-
-@app.route("/music/<username>/")
-def render_music_filter(username):
-    filter_list = Song.query.filter_by(username=username).all()
-    return render_template('music.html', data=filter_list)
-
-@app.route("/iloveyou/<name>/")
-def iloveyou(name):
-    motto = f"{name}야 난 너뿐이야!"
-
-    context = {
-        'name': name,
-        'motto': motto,
-    }
-    return render_template('motto.html', data=context)
-
-@app.route("/music/create/")
-def music_create():
     #form에서 보낸 데이터 받아오기
-    username_receive = request.args.get("username")
-    title_receive = request.args.get("title")
-    artist_receive = request.args.get("artist")
-    image_receive = request.args.get("image_url")
+    contents_receive = request.args.get("contents")
 
     # 데이터를 DB에 저장하기
-    song = Song(username=username_receive, title=title_receive, artist=artist_receive, image_url=image_receive)
-    db.session.add(song)
+    wish = Wish(contents = contents_receive)
+    db.session.add(wish)
     db.session.commit()
-    return redirect(url_for('render_music_filter', username=username_receive))
+    return redirect(url_for('wish'))
+
+#소원 게시글 목록 불러오기
+@app.route("/wish/")
+def wish():
+    wish_list = Wish.query.all()
+    return render_template('index-init.html', data=wish_list)
 
 if __name__ == "__main__":
     app.run(debug=True)
