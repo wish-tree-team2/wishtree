@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap");
+      * {
+        font-family: "Noto Sans KR", sans-serif;
+      }
+      h1 {
+        font-size: 60px;
+        text-align: center;
+      }
+      h4 {
+        font-size: 21px;
+        text-align: center;
+        margin-top: -40px;
+      }
+      .section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 90%;
+        height: 90vh;
+        margin: 0 auto;
+      }
+      .tree {
+        width: 35%;
+        height: 100%;
+        background-color: yellowgreen;
+        position: relative;
+      }
+      .tree > .imgbox {
+        width: 100%;
+        height: 100%;
+      }
+      .tree > .imgbox > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .countWish {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #d9d9d9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+      .textbox {
+        width: 55%;
+        height: 100%;
+        text-align: center;
+        position: relative;
+      }
+      .cheerUpButton {
+        width: 430px;
+        height: 90px;
+        text-align: center;
+        border-radius: 45px;
+        background-color: #d9d9d9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 38%;
+      }
+      .content {
+        width: 100%;
+        height: 70px;
+        text-align: center;
+        background-color: #d9d9d9;
+        margin-top: 20px;
+        /* position: absolute;
+        top: 150px;
+        right: 0; */
+        border-radius: 45px;
+        /* padding-top: 8px; */
+      }
+      .content > .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        margin: 0 30px;
+      }
+      .content > .msg {
+        font-size: 30px;
+        text-align: left;
+        margin-left: 30px;
+      }
+      .contentMsg {
+        margin-top: 40px;
+      }
+      .enrollWish {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 180px;
+        padding: 50px;
+        background-color: yellowgreen;
+        text-align: center;
+      }
+      .enrollWish > form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+      .enrollWish > button {
+        transform: translateX(-500%);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Wish Tree</h1>
+      <h4>응원을 하면 나무가 무럭무럭 자라나요~!</h4>
+    </header>
+    <section class="section">
+      <div class="tree">
+        <div class="imgbox">
+          <img src="{{url_for('static',filename='tree1.png')}}" alt="" />
+          <img src="{{url_for('static',filename='tree2.png')}}" alt="" />
+          <img src="{{url_for('static',filename='tree3.png')}}" alt="" />
+        </div>
+        <div class="flowerpot">
+          <img src="{{url_for('static',filename='flowerpot.png')}}" alt="" />
+        </div>
+        <div class="countWish">3</div>
+      </div>
+
+      <div class="textbox">
+        <div class="cheerUpButton">응원의 말 건네기</div>
+        <div class="contentMsg">
+          <div class="content">
+            <div class="msg">작성된 응원</div>
+            <div class="info">
+              <div class="date">yyyy-mm-dd</div>
+              <div class="name">닉네임</div>
+            </div>
+          </div>
+          <div class="content">
+            <div class="msg">작성된 응원</div>
+            <div class="info">
+              <div class="date">yyyy-mm-dd</div>
+              <div class="name">닉네임</div>
+            </div>
+          </div>
+          <div class="content">
+            <div class="msg">작성된 응원</div>
+            <div class="info">
+              <div class="date">yyyy-mm-dd</div>
+              <div class="name">닉네임</div>
+            </div>
+          </div>
+          <div class="content">
+            <div class="msg">작성된 응원</div>
+            <div class="info">
+              <div class="date">yyyy-mm-dd</div>
+              <div class="name">닉네임</div>
+            </div>
+          </div>
+          <div class="content">
+            <div class="msg">작성된 응원</div>
+            <div class="info">
+              <div class="date">yyyy-mm-dd</div>
+              <div class="name">닉네임</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- 응원의 말 모달 -->
+    <!-- <div class="enrollWish">
+      <form action="#">
+        <textarea name="#" id="" cols="30" rows="10">
+소원을 입력해주세요</textarea
+        >
+        <button>확인</button>
+      </form>
+    </div> -->
+  </body>
+</html>
