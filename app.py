@@ -6,6 +6,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
+app.static_folder = 'static'
+
 import random, os
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -72,7 +74,7 @@ def home():
         "list": list,
         "message": random_message,
     }
-    return render_template('wish.html', data=context)
+    return render_template('index.html', data=context)
 
 
 @app.route('/wish/create/', methods=['POST'])
@@ -94,6 +96,14 @@ def add_cheering(wish_id):
             db.session.add(cheering)
             db.session.commit()
     return redirect('/')
+
+
+@app.route('/wish/<int:wish_id>/comments', methods=['GET'])
+def count_cheering(wish_id):
+    cheering_list = Cheering.query.filter_by(wish_id=wish_id).all()
+    print(cheering_list)
+    print(len(cheering_list))
+    return redirect('/');
 
 if __name__ == "__main__":
     app.run(debug=True)

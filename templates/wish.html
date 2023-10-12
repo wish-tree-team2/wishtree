@@ -2,9 +2,14 @@
 <html>
   <head>
     <title>Wish Page</title>
+
   </head>
   <body>
-    <p>{{ encouragement_message }}</p>
+    <div id="showcase_table">
+      <div id="showcase_cell">
+        <div class="bounce_in_animation">{{ data.message }}</div>
+      </div>
+    </div>
     <form action="/wish/create" method="POST">
       <div class="form-group">
         <label for="contents">소원 입력:</label>
