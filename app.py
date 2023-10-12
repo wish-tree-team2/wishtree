@@ -47,16 +47,5 @@ def wish():
     wish_list = Wish.query.all()
     return render_template('index-init.html', data=wish_list)
 
-@app.route("/")
-def home():
-    name = '최지웅'
-    motto = "행복해서 웃는게 아니라 웃어서 행복합니다."
-
-    context = {
-        "name": name,
-        "motto": motto,
-    }
-    return render_template('motto.html', data=context)
-
 if __name__ == "__main__":
     app.run(debug=True)
