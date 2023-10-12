@@ -38,41 +38,12 @@ def home():
         "name": name,
         "motto": motto,
     }
-    return render_template('motto.html', data=context)
+    return render_template('wishtree.html')
 
-@app.route("/music/")
-def music():
-    song_list = Song.query.all()
-    return render_template('music.html', data=song_list)
 
-@app.route("/music/<username>/")
-def render_music_filter(username):
-    filter_list = Song.query.filter_by(username=username).all()
-    return render_template('music.html', data=filter_list)
 
-@app.route("/iloveyou/<name>/")
-def iloveyou(name):
-    motto = f"{name}야 난 너뿐이야!"
 
-    context = {
-        'name': name,
-        'motto': motto,
-    }
-    return render_template('motto.html', data=context)
 
-@app.route("/music/create/")
-def music_create():
-    #form에서 보낸 데이터 받아오기
-    username_receive = request.args.get("username")
-    title_receive = request.args.get("title")
-    artist_receive = request.args.get("artist")
-    image_receive = request.args.get("image_url")
-
-    # 데이터를 DB에 저장하기
-    song = Song(username=username_receive, title=title_receive, artist=artist_receive, image_url=image_receive)
-    db.session.add(song)
-    db.session.commit()
-    return redirect(url_for('render_music_filter', username=username_receive))
 
 if __name__ == "__main__":
     app.run(debug=True)
