@@ -7,6 +7,8 @@ import random
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 app = Flask(__name__)
+
+
 # DB 기본 코드
 import os
 from flask_sqlalchemy import SQLAlchemy
