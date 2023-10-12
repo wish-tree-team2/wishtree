@@ -33,9 +33,9 @@ Session(app)
 class User(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
-	user_id = db.Column(db.String(80), unique=True)
+	user_id = db.Column(db.String(80), nullable=False,unique=True)
 	password = db.Column(db.String(80), nullable=False)
-	username = db.Column(db.String(80), unique=True)
+	username = db.Column(db.String(80), nullable=False,unique=True)
 
 	def __init__(self, user_id, password, username):
 		self.user_id = user_id
@@ -52,7 +52,7 @@ class Wish(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f'Wish: {self.contents}'
+        return f'Wish for User Id {self.user_id}:{self.contents}'
     
 
 # Cheering 테이블
@@ -90,24 +90,20 @@ def login():
         else:
             flash('로그인 실패. 다시 시도하세요.', 'danger')
 
-#소원 게시글 생성
-@app.route("/wish/create/")
+@app.route('/wish/create/', methods=['POST'])
 def wish_create():
-
-    #form에서 보낸 데이터 받아오기
-    contents_receive = request.args.get("contents")
-
-    # 데이터를 DB에 저장하기
-    wish = Wish(contents = contents_receive)
-    db.session.add(wish)
-    db.session.commit()
-    return redirect(url_for('wish'))
+    if request.method == 'POST':
+        contents = request.form['contents']
+        wish = Wish(contents=contents)
+        db.session.add(wish)
+        db.session.commit()
+    return redirect('/')
 
 #소원 게시글 목록 불러오기
-@app.route("/wish/")
-def wish():
-    wish_list = Wish.query.all()
-    return render_template('index-init.html', data=wish_list)
+# @app.route("/")
+# def wish():
+#     wish_list = Wish.query.all()
+#     return render_template('index-init.html', data=wish_list)
 
 @app.route('/wish/<int:wish_id>/comment', methods=['POST'])
 def add_cheering(wish_id):
@@ -155,29 +151,21 @@ def home():
         return render_template('index-init.html',data=context)
     else:
         return render_template('index-init.html',data=context)
-    
-class SignupForm(FlaskForm):
-    username = StringField('이름', validators=[DataRequired()])
-    password = PasswordField('비밀번호', validators=[DataRequired()])
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/signup", methods=["POST"])
 def signup():
-    form = SignupForm()
 
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
+        user_id = request.form['user_id']
+        username = request.form['username']
+        password = request.form['password']
 
         # 사용자 정보를 데이터베이스에 저장
-        user = User(username=username, password=password)
+        user = User(user_id=user_id,username=username, password=password)
         db.session.add(user)
         db.session.commit()
 
         flash("회원 가입이 완료되었습니다.", "success")
-        return redirect(url_for("login"))
-
-    return render_template("signup.html", form=form)
- 
+        return redirect("/")
     
 if __name__ == "__main__":
     app.run(debug=True)
