@@ -65,15 +65,23 @@ main {
 }
 
 .card {
-  padding: 10px;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 5px #ccc;
   text-align: center;
 }
 
+.card-body {
+  background-color: #b0d9b1;
+}
+
 .card-title {
   font-size: 20px;
   margin-bottom: 10px;
+  background-color: #b0d9b1;
+}
+
+.card-text {
+  background-color: #b0d9b1;
 }
 
 .btn-primary {
@@ -88,6 +96,12 @@ main {
 .btn-primary:hover {
   background-color: #ef9595;
   color: #fff8c9;
+}
+
+.user-color {
+  display: inline-block;
+  color: #ff8dc7;
+  background-color: #b0d9b1;
 }
 
 .text-container h1 {

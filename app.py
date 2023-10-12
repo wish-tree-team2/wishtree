@@ -94,9 +94,17 @@ def login():
 def wish_create():
     if request.method == 'POST':
         contents = request.form['contents']
-        wish = Wish(contents=contents)
-        db.session.add(wish)
-        db.session.commit()
+        # Get the user ID from the session
+        user_id = session.get('user_id')
+        
+        if user_id is not None:
+            wish = Wish(contents=contents, user_id=user_id)
+            db.session.add(wish)
+            db.session.commit()
+        else:
+            wish = Wish(contents=contents, user_id="익명")
+            db.session.add(wish)
+            db.session.commit()
     return redirect('/')
 
 #소원 게시글 목록 불러오기
@@ -146,6 +154,7 @@ def home():
     context = {
         "list": list,
         "message": random_message,
+        "user_id": session.get('user_id'),
     }
     if 'user_id' in session:
         return render_template('index-init.html',data=context)
@@ -166,6 +175,13 @@ def signup():
 
         flash("회원 가입이 완료되었습니다.", "success")
         return redirect("/")
+
+@app.route('/logout')
+def logout():
+    # 세션에서 user_id 제거
+    session.pop('user_id', None)
+    flash('로그아웃되었습니다.', 'success')
+    return redirect('/')
     
 if __name__ == "__main__":
     app.run(debug=True)
