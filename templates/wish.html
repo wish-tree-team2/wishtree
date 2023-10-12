@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wish Page</title>
+  </head>
+  <body>
+    <p>{{ encouragement_message }}</p>
+    <form action="/wish/create" method="POST">
+      <div class="form-group">
+        <label for="contents">소원 입력:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="contents"
+          name="contents"
+          placeholder="소원을 입력하세요"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary">등록</button>
+    </form>
+
+    <!-- Wish 리스트 표시 -->
+    <ul>
+      {% for wish in data['list'] %}
+      <li>{{ wish.contents }}</li>
+      <form action="/wish/{{ wish.id }}/comment" method="POST">
+        <input
+          type="text"
+          name="comment_contents"
+          placeholder="응원을 입력하세요"
+          requird
+        />
+        <button type="submit">등록</button>
+      </form>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

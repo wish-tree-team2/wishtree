@@ -5,74 +5,95 @@
 '''
 from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
-# DB 기본 코드
-import os
+
+import random, os
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__)
+
+# 데이터베이스 설정
 app.config['SQLALCHEMY_DATABASE_URI'] =\
         'sqlite:///' + os.path.join(basedir, 'database.db')
-
 db = SQLAlchemy(app)
 
-class Song(db.Model):
+# Wish 테이블
+class Wish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
-    artist = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    image_url = db.Column(db.String(10000), nullable=False)
+    contents = db.Column(db.String(10000), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
-        return f'{self.title} {self.artist} 추천 by {self.username}'
+        return f'Wish: {self.contents}'
 
+# Cheering 테이블
+class Cheering(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wish_id = db.Column(db.Integer, db.ForeignKey('wish.id'), nullable=False)
+    comment_contents = db.Column(db.String(1000), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'Cheering for Wish ID {self.wish_id}: {self.comment_contents}'
+
+# 데이터베이스 초기화
 with app.app_context():
     db.create_all()
 
 @app.route("/")
 def home():
-    name = '최지웅'
-    motto = "행복해서 웃는게 아니라 웃어서 행복합니다."
-
+    encouragementMessages = [
+    "너는 할 수 있어!",
+    "포기하지 마세요. 꿈을 이루세요!",
+    "언제나 긍정적으로 생각하세요.",
+    "오늘도 힘차게 달려봐요!",
+    "어제보다 오늘 더 나은 일 하시길 바랍니다.",
+    "당신은 놀라울 정도로 강하고 용감해요.",
+    "힘들어도 웃어요, 모든 게 괜찮아질 거예요.",
+    "지금이 최고의 순간이에요.",
+    "당신은 뛰어난 성과를 이룰 수 있어요.",
+    "절대 포기하지 마세요!",
+    "불가능한 것은 없어요.",
+    "당신은 특별한 사람이에요.",
+    "성공은 힘든 노력 뒤에 숨어 있어요.",
+    "오늘은 더 나은 날이 될 거예요.",
+    "자신을 믿어보세요, 당신은 충분히 강해요.",
+    "도전은 성장의 시작이에요.",
+    "당신은 어떤 일도 이길 수 있어요.",
+    "매일이 좋은 기회에요.",
+    "긍정적인 생각은 긍정적인 결과를 가져올 거예요.",
+    "당신의 꿈을 위해 노력하세요!",
+    "모든 것은 당신의 노력에 달려있어요."
+    ]
+    list = Wish.query.all()
+    random_message = random.choice(encouragementMessages)
     context = {
-        "name": name,
-        "motto": motto,
+        "list": list,
+        "message": random_message,
     }
-    return render_template('motto.html', data=context)
+    return render_template('wish.html', data=context)
 
-@app.route("/music/")
-def music():
-    song_list = Song.query.all()
-    return render_template('music.html', data=song_list)
 
-@app.route("/music/<username>/")
-def render_music_filter(username):
-    filter_list = Song.query.filter_by(username=username).all()
-    return render_template('music.html', data=filter_list)
+@app.route('/wish/create/', methods=['POST'])
+def wish():
+    if request.method == 'POST':
+        contents = request.form['contents']
+        wish = Wish(contents=contents)
+        db.session.add(wish)
+        db.session.commit()
+    return redirect('/')
 
-@app.route("/iloveyou/<name>/")
-def iloveyou(name):
-    motto = f"{name}야 난 너뿐이야!"
-
-    context = {
-        'name': name,
-        'motto': motto,
-    }
-    return render_template('motto.html', data=context)
-
-@app.route("/music/create/")
-def music_create():
-    #form에서 보낸 데이터 받아오기
-    username_receive = request.args.get("username")
-    title_receive = request.args.get("title")
-    artist_receive = request.args.get("artist")
-    image_receive = request.args.get("image_url")
-
-    # 데이터를 DB에 저장하기
-    song = Song(username=username_receive, title=title_receive, artist=artist_receive, image_url=image_receive)
-    db.session.add(song)
-    db.session.commit()
-    return redirect(url_for('render_music_filter', username=username_receive))
+@app.route('/wish/<int:wish_id>/comment', methods=['POST'])
+def add_cheering(wish_id):
+    if request.method == 'POST':
+        comment_contents = request.form['comment_contents']
+        wish = Wish.query.get(wish_id) 
+        if wish:
+            cheering = Cheering(wish_id=wish_id, comment_contents=comment_contents)
+            db.session.add(cheering)
+            db.session.commit()
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)
