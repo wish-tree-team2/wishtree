@@ -12,7 +12,6 @@ import random, os
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # 데이터베이스 설정
