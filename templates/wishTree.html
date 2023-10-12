@@ -23,19 +23,23 @@
     <section class="section">
       <div class="tree">
         <div class="imgbox">
-          <!-- data= cheering 넘어오는 개수 -->
-          {% if data=0 %}
+          {% if cheerings.comment_count(cheerings.wish_id) == 0 %}
+          <img src="{{ url_for('static', filename='plant.png') }}" alt="" />
+          {% elif cheerings.comment_count(cheerings.wish_id) > 1 and
+          cheerings.comment_count(cheerings.wish_id) < 2 %}
           <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
-          {% elif data>1 and data<2 %}
-          <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
-          {% elif data>2 and data<3 %}
+          {% elif cheerings.comment_count(cheerings.wish_id) > 2 and
+          cheerings.comment_count(cheerings.wish_id) < 3 %}
           <img src="{{ url_for('static', filename='./arbol.png') }}" alt="" />
           {% else %}
           <img src="{{ url_for('static', filename='.arbol2.png') }}" alt="" />
           {% endif %}
         </div>
 
-        <div class="countWish">{{data. comment 개수}}</div>
+        <!-- 코멘트 갯수 -->
+        <div class="countWish">
+          {{cheerings.comment_count(cheerings.wish_id)}}
+        </div>
       </div>
 
       <div class="textbox">
@@ -64,7 +68,7 @@
 
     <!-- 응원의 말 모달 -->
 
-    <form action="/wish/<int:wish_id>/comment" method="POST">
+    <form action="add_cheering" method="POST">
       <div
         class="modal"
         id="exampleModal"
