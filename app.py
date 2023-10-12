@@ -3,10 +3,18 @@
 0. Flask : 웹서버를 시작할 수 있는 기능. app이라는 이름으로 플라스크를 시작한다
 1. render_template : html파일을 가져와서 보여준다
 '''
+
 import random
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash,session
+from flask_session import Session
 from datetime import datetime
+import os
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired
+
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 
 # DB 기본 코드
@@ -15,19 +23,38 @@ from flask_sqlalchemy import SQLAlchemy
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-
+app.config['SESSION_TYPE'] = 'filesystem'
 db = SQLAlchemy(app)
+Session(app)
 
+#유저 테이블
+class User(db.Model):
+
+	id = db.Column(db.Integer, primary_key=True)
+	user_id = db.Column(db.String(80), unique=True)
+	password = db.Column(db.String(80), nullable=False)
+	username = db.Column(db.String(80), unique=True)
+
+	def __init__(self, user_id, password, username):
+		self.user_id = user_id
+		self.password = password
+		self.username = username
+        
+    
+#소원 테이블
 class Wish(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     contents = db.Column(db.String(1000), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return f'Wish: {self.contents}'
     
+
 # Cheering 테이블
 class Cheering(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,29 +68,27 @@ class Cheering(db.Model):
 with app.app_context():
     db.create_all()
 
-    # 20개의 응원문구 리스트
-random_encouragements = [
-    "You can do it!",
-    "Believe in yourself!",
-    "Stay positive!",
-    "Dream big!",
-    "Keep going!",
-    "Never give up!",
-    "You are amazing!",
-    "You've got this!",
-    "You're doing great!",
-    "Make it happen!",
-    "Stay focused!",
-    "Chase your dreams!",
-    "Stay strong!",
-    "Good things are coming!",
-    "Stay motivated!",
-    "Stay inspired!",
-    "Shine bright!",
-    "You're unstoppable!",
-    "Embrace the journey!",
-    "Keep smiling!"
-]
+class SignupForm(FlaskForm):
+    username = StringField('이름', validators=[DataRequired()])
+    password = PasswordField('비밀번호', validators=[DataRequired()])
+
+
+#로그인 기능
+@app.route("/login", methods=['POST','GET'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        user_id_receive = request.form['user_id']
+        password_receive = request.form['password']
+        user = User.query.filter_by(user_id = user_id_receive, password = password_receive).first()
+
+        if user is not None:
+            session['user_id'] = user.id
+            flash('로그인 성공!', 'success') 
+            return redirect('/')
+        else:
+            flash('로그인 실패. 다시 시도하세요.', 'danger')
 
 #소원 게시글 생성
 @app.route("/wish/create/")
@@ -96,9 +121,63 @@ def add_cheering(wish_id):
     return redirect('/')
 
 @app.route('/')
-def index():
-    random_encouragement = random.choice(random_encouragements)
-    return render_template('index-init.html', random_encouragement=random_encouragement)
+def home():
+    encouragementMessages = [
+    "너는 할 수 있어!",
+    "포기하지 마세요. 꿈을 이루세요!",
+    "언제나 긍정적으로 생각하세요.",
+    "오늘도 힘차게 달려봐요!",
+    "어제보다 오늘 더 나은 일 하시길 바랍니다.",
+    "당신은 놀라울 정도로 강하고 용감해요.",
+    "힘들어도 웃어요, 모든 게 괜찮아질 거예요.",
+    "지금이 최고의 순간이에요.",
+    "당신은 뛰어난 성과를 이룰 수 있어요.",
+    "절대 포기하지 마세요!",
+    "불가능한 것은 없어요.",
+    "당신은 특별한 사람이에요.",
+    "성공은 힘든 노력 뒤에 숨어 있어요.",
+    "오늘은 더 나은 날이 될 거예요.",
+    "자신을 믿어보세요, 당신은 충분히 강해요.",
+    "도전은 성장의 시작이에요.",
+    "당신은 어떤 일도 이길 수 있어요.",
+    "매일이 좋은 기회에요.",
+    "긍정적인 생각은 긍정적인 결과를 가져올 거예요.",
+    "당신의 꿈을 위해 노력하세요!",
+    "모든 것은 당신의 노력에 달려있어요."
+    ]
+    list = Wish.query.all()
+    random_message = random.choice(encouragementMessages)
+    context = {
+        "list": list,
+        "message": random_message,
+    }
+    if 'user_id' in session:
+        return render_template('index-init.html',data=context)
+    else:
+        return render_template('index-init.html',data=context)
+    
+class SignupForm(FlaskForm):
+    username = StringField('이름', validators=[DataRequired()])
+    password = PasswordField('비밀번호', validators=[DataRequired()])
 
+@app.route("/", methods=["GET", "POST"])
+def signup():
+    form = SignupForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        # 사용자 정보를 데이터베이스에 저장
+        user = User(username=username, password=password)
+        db.session.add(user)
+        db.session.commit()
+
+        flash("회원 가입이 완료되었습니다.", "success")
+        return redirect(url_for("login"))
+
+    return render_template("signup.html", form=form)
+ 
+    
 if __name__ == "__main__":
     app.run(debug=True)
