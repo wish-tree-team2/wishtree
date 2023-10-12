@@ -35,7 +35,7 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.String(80), nullable=False,unique=True)
 	password = db.Column(db.String(80), nullable=False)
-	username = db.Column(db.String(80), nullable=False,unique=True)
+	username = db.Column(db.String(80), nullable=False,unique=True, primary_key=True)
 
 	def __init__(self, user_id, password, username):
 		self.user_id = user_id
@@ -46,13 +46,13 @@ class User(db.Model):
 #소원 테이블
 class Wish(db.Model):
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer,primary_key=True)
     contents = db.Column(db.String(1000), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    username = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False),
 
     def __repr__(self):
-        return f'Wish for User Id {self.user_id}:{self.contents}'
+        return f'Wish for User Id {self.user_name}:{self.contents}'
     
 
 # Cheering 테이블
@@ -94,16 +94,17 @@ def login():
 def wish_create():
     if request.method == 'POST':
         contents = request.form['contents']
-        wish = Wish(contents=contents)
-        db.session.add(wish)
-        db.session.commit()
+        # Get the user ID from the session
+        user_id = session.get('user_id')
+        if user_id is not None:
+            wish = Wish(contents=contents, user_id=user_id)
+            db.session.add(wish)
+            db.session.commit()
+        else:
+            wish = Wish(contents=contents, user_id="익명")
+            db.session.add(wish)
+            db.session.commit()
     return redirect('/')
-
-#소원 게시글 목록 불러오기
-# @app.route("/")
-# def wish():
-#     wish_list = Wish.query.all()
-#     return render_template('index-init.html', data=wish_list)
 
 @app.route('/wish/<int:wish_id>/comment', methods=['POST'])
 def add_cheering(wish_id):
