@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+@import 'reset.css';
+* {
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #dfccfb;
+  color: #fff;
+}
+h1 {
+  font-size: 160px;
+  text-align: center;
+  font-family: 'Nanum Pen Script', cursive;
+}
+.music {
+  font-size: 21px;
+  text-align: center;
+}
+.section {
+  margin-top: -20px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 20px 100px;
+}
+.tree {
+  width: 35%;
+  height: 80%;
+  position: relative;
+}
+.tree > .imgbox {
+  width: 100%;
+  /* height: 100%; */
+}
+.tree > .imgbox > img {
+  width: 100%;
+  /* height: 100%; */
+  object-fit: cover;
+}
+.countWish {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #fff8c9;
+  font-family: 'Nanum Pen Script', cursive;
+  border: none;
+  font-size: 30px;
+  color: #ef9595;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: 10%;
+  right: -10%;
+}
+.countWish:hover {
+  background-color: #ef9595;
+  color: #fff8c9;
+}
+.textbox {
+  width: 55%;
+  height: 100%;
+  text-align: center;
+  position: relative;
+}
+.cheerUpButton {
+  width: 430px;
+  height: 90px;
+  font-family: 'Nanum Pen Script', cursive;
+  border: none;
+  font-size: 30px;
+  color: #ef9595;
+
+  text-align: center;
+  border-radius: 45px;
+  background-color: #fff8c9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 38%;
+}
+.cheerUpButton:hover {
+  background-color: #ef9595;
+  color: #fff8c9;
+}
+.content {
+  width: 100%;
+  height: 70px;
+  text-align: center;
+  margin-top: 20px;
+}
+.content > .info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin: 0 30px;
+}
+.content > .msg {
+  font-size: 30px;
+  text-align: left;
+  margin-left: 30px;
+}
+.contentMsg {
+  margin-top: 40px;
+}
+.enrollWish {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 550px;
+  height: 500px;
+  padding: 50px;
+  text-align: center;
+  /* z-index: -100; */
+}
+.enrollWish > form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.modal-backdrop {
+  display: none !important;
+}
+.modal.show {
+  background: none;
+}

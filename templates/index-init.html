@@ -238,7 +238,8 @@
             <div class="card" style="width: 18rem">
               <div class="card-body">
                 <h5 class="card-title">
-                  <p class="user-color">{{wish.user_id }} 님의 소원</p>
+                  <p class="user-color">{{wish.user_id }}</p>
+                  님의 소원
                 </h5>
                 <p class="card-text">{{wish.contents}}</p>
               </div>
@@ -246,7 +247,11 @@
                 {{ wish.created_at.strftime('%Y-%m-%d %H:%M') }}
               </p>
             </div>
-            <a href="#" class="btn btn-primary">응원하러 가기!</a>
+            <a
+              href="{{ url_for('get_cheerings', wish_id=wish.id) }}"
+              class="btn btn-primary"
+              >응원하러 가기!</a
+            >
           </div>
 
           {% endfor %}
