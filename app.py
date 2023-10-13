@@ -5,16 +5,14 @@
 '''
 
 import random
-from flask import Flask, render_template, request, redirect, url_for, flash,session
-from flask_session import Session
-from datetime import datetime
 import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_session import Session
+from datetime import datetime,timedelta
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
-
-
-
+from pytz import timezone
 
 
 app = Flask(__name__)
@@ -53,13 +51,12 @@ class Wish(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     contents = db.Column(db.String(1000), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    username = db.Column(db.String(80), nullable=True)
 
     def __repr__(self):
         return f'Wish for User Id {self.user_id}:{self.contents}'
-
-
-
+    
 
 # Cheering 테이블
 class Cheering(db.Model):
@@ -70,30 +67,24 @@ class Cheering(db.Model):
     
     def __repr__(self):
         return f'Cheering for Wish ID {self.wish_id}: {self.comment_contents}'
-    
-    ##수정
-    def comment_count(self, wish_id):
-        #댓글 수를 반환
-        return db.session.query(Cheering).filter_by(wish_id=wish_id).count()
-        
-
 
         
 
 with app.app_context():
     db.create_all()
 
-class SignupForm(FlaskForm):
-    username = StringField('이름', validators=[DataRequired()])
-    password = PasswordField('비밀번호', validators=[DataRequired()])
 
 
 #wish_list
 @app.route('/wish/list')
 def wish_list():
     cheerings = Cheering.query.all()
-    print(cheerings)
-    return render_template('wishTree.html', cheerings=cheerings)
+    def comment_count(self, wish_id):
+        #댓글 수를 반환
+        return db.session.query(Cheering).filter_by(wish_id=wish_id).count()
+    return render_template('wishTree.html', cheerings=cheerings,comment_count=comment_count(wish_id))
+
+
 
 
 #로그인 기능
@@ -108,16 +99,11 @@ def login():
 
         if user is not None:
             session['user_id'] = user.id
+            session['username'] = user.username
             flash('로그인 성공!', 'success') 
             return redirect('/')
         else:
             flash('로그인 실패. 다시 시도하세요.', 'danger')
-
-
-
-
-
-
 
 @app.route('/wish/create/', methods=['POST'])
 def wish_create():
@@ -125,6 +111,16 @@ def wish_create():
         contents = request.form['contents']
         # Get the user ID from the session
         user_id = session.get('user_id')
+<<<<<<< HEAD
+        username = session.get('username')
+        
+        if user_id is not None:
+            wish = Wish(contents=contents, user_id=user_id, username = username)
+            db.session.add(wish)
+            db.session.commit()
+        else:
+            wish = Wish(contents=contents, user_id="익명", username = "익명")
+=======
         
         if user_id is not None:
             wish = Wish(contents=contents, user_id=user_id)
@@ -132,11 +128,10 @@ def wish_create():
             db.session.commit()
         else:
             wish = Wish(contents=contents, user_id="익명")
+>>>>>>> 345887e412697a62f873faee85e5e6fc80f14a82
             db.session.add(wish)
             db.session.commit()
     return redirect('/')
-
-
 
 #소원 게시글 목록 불러오기
 # @app.route("/")
@@ -153,7 +148,6 @@ def add_cheering(wish_id):
             cheering = Cheering(wish_id=wish_id, comment_contents=comment_contents)
             db.session.add(cheering)
             db.session.commit()
-          
     return redirect('/')
 
 @app.route('/')
@@ -187,9 +181,10 @@ def home():
         "list": list,
         "message": random_message,
         "user_id": session.get('user_id'),
-        ## 수정:  밑에 2줄
-        "comment_contents": session.get('comment_contents'),  # 세션에서 comment_contents 가져오기
-        "wish_id": session.get('wish_id')  ##
+<<<<<<< HEAD
+        "username": session.get('uesrname'),
+=======
+>>>>>>> 345887e412697a62f873faee85e5e6fc80f14a82
     }
     if 'user_id' in session:
         return render_template('index-init.html',data=context)
@@ -218,12 +213,5 @@ def logout():
     flash('로그아웃되었습니다.', 'success')
     return redirect('/')
     
-
-
-
-
-
-
-
 if __name__ == "__main__":
     app.run(debug=True)
