@@ -24,7 +24,7 @@
       <div class="tree">
         <div class="imgbox">
           <!-- data= cheering 넘어오는 개수 -->
-          {% if data=0 %}
+          {% if data==0 %}
           <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
           {% elif data>1 and data<2 %}
           <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
@@ -35,7 +35,7 @@
           {% endif %}
         </div>
 
-        <div class="countWish">{{data. comment 개수}}</div>
+        <div class="countWish">{{data.comment}}개수</div>
       </div>
 
       <div class="textbox">

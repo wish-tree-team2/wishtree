@@ -96,7 +96,6 @@ def wish_create():
         contents = request.form['contents']
         # Get the user ID from the session
         user_id = session.get('user_id')
-<<<<<<< HEAD
         username = session.get('username')
         
         if user_id is not None:
@@ -105,17 +104,9 @@ def wish_create():
             db.session.commit()
         else:
             wish = Wish(contents=contents, user_id="익명", username = "익명")
-=======
-        
-        if user_id is not None:
-            wish = Wish(contents=contents, user_id=user_id)
             db.session.add(wish)
             db.session.commit()
-        else:
-            wish = Wish(contents=contents, user_id="익명")
->>>>>>> 345887e412697a62f873faee85e5e6fc80f14a82
-            db.session.add(wish)
-            db.session.commit()
+
     return redirect('/')
 
 #소원 게시글 목록 불러오기
@@ -166,15 +157,21 @@ def home():
         "list": list,
         "message": random_message,
         "user_id": session.get('user_id'),
-<<<<<<< HEAD
         "username": session.get('uesrname'),
-=======
->>>>>>> 345887e412697a62f873faee85e5e6fc80f14a82
     }
     if 'user_id' in session:
         return render_template('index-init.html',data=context)
     else:
         return render_template('index-init.html',data=context)
+    
+@app.route('/wish/list')
+def wish_list():
+    cheerings = Cheering.query.all()
+    cheerings_count = len(cheerings)
+    # def comment_count(self, wish_id):
+    #     #댓글 수를 반환
+    #     return db.session.query(Cheering).filter_by(wish_id=wish_id).count()
+    return render_template('wishTree.html', cheerings = cheerings ,data=cheerings_count)
 
 @app.route("/signup", methods=["POST"])
 def signup():
