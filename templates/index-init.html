@@ -235,9 +235,18 @@
               </div>
             </div>
             <!-- 수정 -->
-            <a href="{{url_for('wish_list')}}" class="btn btn-primary"
-              >응원하러 가기!</a
+            <form
+              action="{{url_for('wish_list',wish_id=wish.id)}}"
+              method="post"
             >
+              <button type="submit">응원하러 가기!</button>
+            </form>
+#wish_list
+@app.route('/wish/list/<int:wish_id>', methods=['POST'])
+def wish_list(wish_id):
+    wish_id=int(request.form['wish_id'])
+    cheerings = Cheering.query.filter_by('wish_id=wish_id').count()
+    return render_template('wishTree.html', cheerings=cheerings)
           </div>
           {% endfor %}
         </div>
