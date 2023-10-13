@@ -5,13 +5,15 @@
 '''
 
 import random
-from flask import Flask, render_template, request, redirect, url_for, flash,session
-from flask_session import Session
-from datetime import datetime
 import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_session import Session
+from datetime import datetime,timedelta
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
+from pytz import timezone
+
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -35,7 +37,7 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.String(80), nullable=False,unique=True)
 	password = db.Column(db.String(80), nullable=False)
-	username = db.Column(db.String(80), nullable=False,unique=True, primary_key=True)
+	username = db.Column(db.String(80), nullable=False,unique=True)
 
 	def __init__(self, user_id, password, username):
 		self.user_id = user_id
@@ -46,13 +48,14 @@ class User(db.Model):
 #소원 테이블
 class Wish(db.Model):
 
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     contents = db.Column(db.String(1000), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    username = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False),
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    username = db.Column(db.String(80), nullable=True)
 
     def __repr__(self):
-        return f'Wish for User Id {self.user_name}:{self.contents}'
+        return f'Wish for User Id {self.user_id}:{self.contents}'
     
 
 # Cheering 테이블
@@ -60,17 +63,13 @@ class Cheering(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     wish_id = db.Column(db.Integer, db.ForeignKey('wish.id'), nullable=False)
     comment_contents = db.Column(db.String(1000), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone('Asia/Seoul')))
     
     def __repr__(self):
         return f'Cheering for Wish ID {self.wish_id}: {self.comment_contents}'
 
 with app.app_context():
     db.create_all()
-
-class SignupForm(FlaskForm):
-    username = StringField('이름', validators=[DataRequired()])
-    password = PasswordField('비밀번호', validators=[DataRequired()])
 
 
 #로그인 기능
@@ -85,6 +84,7 @@ def login():
 
         if user is not None:
             session['user_id'] = user.id
+            session['username'] = user.username
             flash('로그인 성공!', 'success') 
             return redirect('/')
         else:
@@ -96,15 +96,23 @@ def wish_create():
         contents = request.form['contents']
         # Get the user ID from the session
         user_id = session.get('user_id')
+        username = session.get('username')
+        
         if user_id is not None:
-            wish = Wish(contents=contents, user_id=user_id)
+            wish = Wish(contents=contents, user_id=user_id, username = username)
             db.session.add(wish)
             db.session.commit()
         else:
-            wish = Wish(contents=contents, user_id="익명")
+            wish = Wish(contents=contents, user_id="익명", username = "익명")
             db.session.add(wish)
             db.session.commit()
     return redirect('/')
+
+#소원 게시글 목록 불러오기
+# @app.route("/")
+# def wish():
+#     wish_list = Wish.query.all()
+#     return render_template('index-init.html', data=wish_list)
 
 @app.route('/wish/<int:wish_id>/comment', methods=['POST'])
 def add_cheering(wish_id):
@@ -147,6 +155,8 @@ def home():
     context = {
         "list": list,
         "message": random_message,
+        "user_id": session.get('user_id'),
+        "username": session.get('uesrname'),
     }
     if 'user_id' in session:
         return render_template('index-init.html',data=context)
@@ -167,6 +177,13 @@ def signup():
 
         flash("회원 가입이 완료되었습니다.", "success")
         return redirect("/")
+
+@app.route('/logout')
+def logout():
+    # 세션에서 user_id 제거
+    session.pop('user_id', None)
+    flash('로그아웃되었습니다.', 'success')
+    return redirect('/')
     
 if __name__ == "__main__":
     app.run(debug=True)

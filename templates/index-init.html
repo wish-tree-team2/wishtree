@@ -23,6 +23,12 @@
           <a class="nav-link" aria-current="page" href="/">WishTree</a>
         </li>
         <div class="nav-box">
+          {% if data.user_id %} {# 세션에 user_id가 있는 경우에만 로그아웃 메뉴
+          표시 #}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">로그아웃</a>
+          </li>
+          {% elif not user_id %} {# 세션에 user_id가 없는 경우 #}
           <li class="nav-item">
             <button
               type="button"
@@ -163,6 +169,7 @@
               </div>
             </div>
           </li>
+          {% endif %}
           <li class="nav-item">
             <button
               class="modal-button"
@@ -230,12 +237,18 @@
           <div class="card-box">
             <div class="card" style="width: 18rem">
               <div class="card-body">
-                <h5 class="card-title">{{wish.username}}</h5>
+                <h5 class="card-title">
+                  <p class="user-color">{{wish.username }} 님의 소원</p>
+                </h5>
                 <p class="card-text">{{wish.contents}}</p>
               </div>
+              <p class="card-date">
+                {{ wish.created_at.strftime('%Y-%m-%d %H:%M') }}
+              </p>
             </div>
             <a href="#" class="btn btn-primary">응원하러 가기!</a>
           </div>
+
           {% endfor %}
         </div>
       </section>
