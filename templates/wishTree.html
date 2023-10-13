@@ -4,38 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
-      rel="stylesheet"
-      href="{{url_for('static',filename='css/wishtree.css')}}"
-    />
-    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <link
+    rel="stylesheet"
+    href="{{url_for('static',filename='css/wishtree.css')}}"
+  />
     <title>Document</title>
   </head>
   <body>
     <header>
-      <h1>Wish Tree</h1>
+      <div class="header">
+        <a class="nav-link" aria-current="page" href="/">WishTree</a>
+      </div>
       <p class="music">응원을 하면 나무가 무럭무럭 자라나요~!</p>
     </header>
     <section class="section">
       <div class="tree">
         <div class="imgbox">
-          <!-- data= cheering 넘어오는 개수 -->
-          {% if data==0 %}
-          <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
-          {% elif data>1 and data<2 %}
-          <img src="{{ url_for('static', filename='./plant.png') }}" alt="" />
-          {% elif data>2 and data<3 %}
-          <img src="{{ url_for('static', filename='./arbol.png') }}" alt="" />
+          {% if count == 0 %}
+          <img src="{{ url_for('static', filename='plant.png') }}" alt="" />
+          {% elif count > 0 and count < 2 %}
+          <img src="{{ url_for('static', filename='plant.png') }}" alt="" />
+          {% elif count > 1 and count < 3 %}
+          <img src="{{ url_for('static', filename='arbol.png') }}" alt="" />
           {% else %}
-          <img src="{{ url_for('static', filename='.arbol2.png') }}" alt="" />
+          <img src="{{ url_for('static', filename='arbol2.png') }}" alt="" />
           {% endif %}
         </div>
 
-        <div class="countWish">{{data.comment}}개수</div>
+        <!-- 코멘트 갯수 -->
+        <div class="countWish">{{count}}</div>
       </div>
 
       <div class="textbox">
@@ -53,7 +55,7 @@
           <div class="content">
             <div class="msg">{{ cheering.comment_contents }}</div>
             <div class="info">
-              <div class="date">{{ cheering.created_at}}</div>
+              <div class="date">{{ cheering.created_at.strftime('%Y-%m-%d %H:%M')}}</div>
               <div class="name">{{ cheering.wish_id }}</div>
             </div>
           </div>
@@ -63,8 +65,7 @@
     </section>
 
     <!-- 응원의 말 모달 -->
-
-    <form action="/wish/<int:wish_id>/comment" method="POST">
+    <form action="{{url_for('add_cheering',wish_id=wish.id)}}" method="POST">
       <div
         class="modal"
         id="exampleModal"
@@ -85,7 +86,6 @@
               >
                 소원 응원하기
               </h1>
-
               <button
                 type="button"
                 class="btn-close"
@@ -103,7 +103,7 @@
             </div>
             <div class="modal-footer">
               <button
-                type="button"
+                type="submit"
                 class="btn"
                 style="background-color: #dfccfb"
               >
